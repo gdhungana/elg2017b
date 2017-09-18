@@ -1,3 +1,4 @@
+from __future__ import print_function
 import numpy as np
 from astropy.table import Table, Column, vstack
 from astropy.io import fits
@@ -66,7 +67,7 @@ brickname='testbrick',galsim=False,ra=None,dec=None):
     # Initialize random number generator to use.
     random_state = np.random.RandomState(seed)
 
-    # Create a blank fake fibermap for bricks
+    #- Create a blank fake fibermap for bricks
     fibermap = empty_fibermap(nspec)
     targetids = random_state.randint(2**62, size=nspec)
     fibermap['TARGETID'] = targetids
@@ -77,9 +78,8 @@ brickname='testbrick',galsim=False,ra=None,dec=None):
     objtype='ELG'
     true_objtype = np.tile(np.array([objtype]),(nspec))
 
-    # Initialize the output truth table.
+    #- Initialize the output truth table.
     spectra = []
-    #wavelengths = qsim.source.wavelength_out.to(u.Angstrom).value
     wavemin = desimodel.io.load_throughput('b').wavemin
     wavemax = desimodel.io.load_throughput('z').wavemax
     dw = 0.2
@@ -138,6 +138,7 @@ brickname='testbrick',galsim=False,ra=None,dec=None):
     spectra=truth['FLUX']*1.0e17
     print("Simulating Spectra")
     for j in range(nspec):
+        print("Simulating %s/%s spectra"%(j,nspec),end='\r')
         thisobjtype='ELG'
         sys.stdout.flush()
 
@@ -167,10 +168,8 @@ brickname='testbrick',galsim=False,ra=None,dec=None):
 
         else: thisexptime=exptime[j]
 
-        print thisexptime
         nqsim=update_simulator(qsim,airmass=thisairmass, exptime=thisexptime, seeing=thisseeing, moon_frac=thismoon_frac, moon_sep=thismoon_sep, moon_alt=thismoon_alt,galsim=galsim)
 
-        print nqsim.observation.exposure_time
         nqsim.source.update_in(
                 'Quickgen source {0}'.format(j), thisobjtype.lower(),
                 wavelengths * u.Angstrom, spectra[j, :] * fluxunits)

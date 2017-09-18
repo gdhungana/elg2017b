@@ -21,7 +21,6 @@ def parse():
     parser.add_argument('--galsim', default=False, action='store_true', help='Vary seeing')
     parser.add_argument('--moon', default=False, action='store_true', help='Vary moon parameters')
     parser.add_argument('--transparency', default=False, action='store_true', help='Vary transparency')
-    parser.add_argument('--paramfile',default='paramfile.txt', help='Parameter file to save')
     parser.add_argument('--breakbricks',default=False, action='store_true', help='Break in smaller target sample bricks')
     
     args=parser.parse_args()
@@ -85,9 +84,9 @@ def main(args=None):
         exposure_t.append(exp)
     print("Exposure Time: {}".format(exposure_t))
     #- write out the observation parameter file
-    if args.paramfile:
-        np.savetxt(args.paramfile,np.c_[airmass,ebv,seeing,transparency,moon_frac,moon_sep,moon_alt,exposure_t])
-        print("Wrote parameter file {}".format(args.paramfile))  
+    paramfile='param_'+str(args.seed)+'.txt'
+    np.savetxt(paramfile,np.c_[airmass,ebv,seeing,transparency,moon_frac,moon_sep,moon_alt,exposure_t],fmt='%.3f')
+    print("Wrote parameter file {}".format(paramfile))  
     #- Now simulate:
     if args.breakbricks:
         print("Running Many bricks mode")
