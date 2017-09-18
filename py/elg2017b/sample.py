@@ -26,6 +26,7 @@ def sample_airmass(expfile,nobs=5000,seed=1234):
 
 def sample_ebv(expfile,nobs=5000,seed=1234):
     #- sample the tileid, and get the E(B-V) from desi-tiles.fits file
+    import os
     rst=np.random.RandomState(seed)
     exp=fits.open(expfile)
     tileid=exp[1].data['tileid']
@@ -47,11 +48,13 @@ def sample_moon(expfile,nobs=5000,seed=1234):
     exp=fits.open(expfile)
     pas=exp[1].data['pass']
     #nexp=len(exp[1].data['moonfrac'])
-    moonfrac=exp[1].data['moonfrac'][pas]
-    moonsep=exp[1].data['moonsep'][pas]
+    moonfrac=exp[1].data['moonfrac'][pas==4]
+    moonsep=exp[1].data['moonsep'][pas==4]
+    moonalt=exp[1].data['moonalt'][pas==4]
     #- sample with no correlation
     samp_frac=rst.choice(moonfrac,size=nobs)
     samp_sep=rst.choice(moonsep,size=nobs)
+    samp_alt=rst.choice(moonalt,size=nobs)
     
-    return samp_frac,samp_sep
+    return samp_frac,samp_sep,samp_alt
     

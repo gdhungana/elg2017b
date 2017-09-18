@@ -1,0 +1,100 @@
+#!/usr/bin/env python
+#from __future__ import absolute_import, division, print_function
+
+import argparse
+import numpy as np
+import astropy.units as u
+
+from elg2017b.simulate import simulate
+from elg2017b import exptime,sample
+
+def parse():
+    parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument('--brickname',type=str, default='testbrick', help="brickname")
+    parser.add_argument('--seed', type =int, default=1234)
+    parser.add_argument('--nspec',type=int,default=100)
+    parser.add_argument('--expfile',type=str,required=True,help='exposure file from surveysim')
+    parser.add_argument('--airmass', default=False,action='store_true',help='Vary airmass?')
+    parser.add_argument('--ebv', default=False, action='store_true', help='Vary dust extinction?')
+    parser.add_argument('--seeing', default=False, action='store_true', help='Vary seeing')
+    parser.add_argument('--galsim', default=False, action='store_true', help='Vary seeing')
+    parser.add_argument('--moon', default=False, action='store_true', help='Vary moon parameters')
+    parser.add_argument('--transparency', default=False, action='store_true', help='Vary transparency')
+    parser.add_argument('--paramfile',default='paramfile.txt', help='Parameter file to save')
+    parser.add_argument('--breakbricks',default=False, action='store_true', help='Break in smaller target sample bricks')
+    
+    args=parser.parse_args()
+    return args
+
+def main(args=None):
+    from desisurvey.config import Configuration
+    cc=Configuration()
+
+    if args is None:
+       args=parse()
+    #- sample desimodel param
+    #mra,mdec,mamass,mebv,mexpf=sample.sample_model(args.nspec,seed=args.seed)
+    #targetra=mra
+    #targetdec=mdec
+
+    if args.airmass:
+       airmass=sample.sample_airmass(args.expfile,nobs=args.nspec,seed=args.seed)
+
+    else:
+        airmass=[cc.nominal_conditions.airmass()]*args.nspec
+    print("Airmass:{}".format(airmass))
+
+    #- ebv is close to desimodel
+    if args.ebv:
+       ebv=sample.sample_ebv(args.expfile,nobs=args.nspec,seed=args.seed)
+    else:
+        ebv=[cc.nominal_conditions.EBV()]*args.nspec
+    print("E(B-V):{}".format(ebv))
+    print("MAx E(B-V) {}".format(np.max(ebv)))
+    #- seeing
+    if args.seeing:
+        seeing=sample.sample_seeing(args.expfile,args.nspec,seed=args.seed)
+    else:
+        seeing=[cc.nominal_conditions.seeing().value]*args.nspec
+    print("Seeing:{}".format(seeing))
+
+    #- transparency
+    if args.transparency:
+        transparency=sample.sample_transparency(args.expfile,nobs=args.nspec,seed=args.seed)
+    else:
+        transparency=[cc.nominal_conditions.transparency()]*args.nspec
+    print("Transparency: {}".format(transparency))
+
+    #- moon
+    if args.moon:
+        moon_frac,moon_sep,moon_alt=sample.sample_moon(args.expfile,nobs=args.nspec,seed=args.seed)
+    else:
+        moon_frac=[0.]*args.nspec
+        moon_sep=[60.]*args.nspec
+        moon_alt=[-10.]*args.nspec
+    print("Moon frac: {}".format(moon_frac))
+    print("Moon sep: {}".format(moon_sep))
+    print("Moon alt: {}".format(moon_alt))
+
+    
+    #-exposure time
+    exposure_t=[]
+    for ii in range(args.nspec):
+        exp=exptime.get_exptime(seeing[ii],transparency[ii],airmass[ii],ebv[ii],moon_frac[ii],moon_sep[ii],moon_alt[ii])
+        exposure_t.append(exp)
+    print("Exposure Time: {}".format(exposure_t))
+    #- write out the observation parameter file
+    if args.paramfile:
+        np.savetxt(args.paramfile,np.c_[airmass,ebv,seeing,transparency,moon_frac,moon_sep,moon_alt,exposure_t])
+        print("Wrote parameter file {}".format(args.paramfile))  
+    #- Now simulate:
+    if args.breakbricks:
+        print("Running Many bricks mode")
+        simulate(airmass=airmass,exptime=exposure_t,seeing=seeing,moon_frac=None,moon_sep=None,moon_alt=None,seed=args.seed, nspec=args.nspec,galsim=args.galsim,ra=targetra,dec=targetdec)
+    else:
+        print("Running a single brick mode. Brick name: {}".format(args.brickname))
+        simulate(airmass=airmass,exptime=exposure_t,seeing=seeing,moon_frac=None,moon_sep=None,moon_alt=None,seed=args.seed, nspec=args.nspec,brickname=args.brickname,galsim=args.galsim)    
+    
+if __name__=='__main__':
+    main()
