@@ -88,7 +88,7 @@ def main(args=None):
     #- Now simulate:
     if args.breakbricks:
         print("Running Many bricks mode")
-        simulate(airmass=airmass,exptime=exposure_t,seeing=seeing,moon_frac=None,moon_sep=None,moon_alt=None,seed=args.seed, nspec=args.nspec,galsim=args.galsim,ra=targetra,dec=targetdec)
+        simulate(airmass=airmass,exptime=exposure_t,seeing=seeing,moon_frac=None,moon_sep=None,moon_alt=None,seed=args.seed, nspec=args.nspec,galsim=args.galsim)
     else:
         print("Running a single brick mode. Brick name: {}".format(args.brickname))
         simulate(airmass=airmass,exptime=exposure_t,seeing=seeing,moon_frac=None,moon_sep=None,moon_alt=None,seed=args.seed, nspec=args.nspec,brickname=args.brickname,galsim=args.galsim)    
