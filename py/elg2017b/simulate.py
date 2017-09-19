@@ -11,7 +11,6 @@ import desiutil.io
 import astropy.units as u
 from specsim import simulator
 import sys,os
-from desispec import brick
 import desimodel.io
 
 def get_templates(wavelength,seed=1234,nmodel=5000):

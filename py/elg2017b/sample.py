@@ -32,7 +32,7 @@ def sample_tiles(expfile,nobs=5000,seed=1234,ebv=False,factor=10):
     tileid=exp[1].data['tileid']
     ra=exp[1].data['ra']
     dec=exp[1].data['dec']
-    nn=nobs/factor#+nobs%factor #- limit to few bricks to avoid a single brick per brick
+    nn=int(nobs/factor)#+nobs%factor #- limit to few bricks to avoid a single brick per brick
     ii=rst.choice(len(tileid),size=nn)#- sampling only nobs/10 tiles
     sample_tiles=tileid[ii]
     #- find the match in desitiles 

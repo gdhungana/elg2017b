@@ -42,10 +42,10 @@ echo "This param file is", ${paramfile}
 if [[ $mode == "nominal" ]]
 then
     echo "Simulating mode:", $mode 
-    srun -o ${out} run_simulation --expfile ${expfile} --brickname ${brickname} --nspec ${nspec} --seed ${seed} --paramfile ${paramfile} --breakbricks >> ${logfile} 2>&1
+    srun -o ${out} run_simulation --expfile ${expfile} --brickname ${brickname} --nspec ${nspec} --seed ${seed} --breakbricks >> ${logfile} 2>&1
 else
     echo "Simulation mode:", $mode
-    srun -o ${out} run_simulation --expfile ${expfile} --brickname ${brickname} --${mode} --galsim --nspec ${nspec} --seed ${seed} --paramfile ${paramfile} --breakbricks >> ${logfile} 2>&1
+    srun -o ${out} run_simulation --expfile ${expfile} --brickname ${brickname} --${mode} --galsim --nspec ${nspec} --seed ${seed} --breakbricks >> ${logfile} 2>&1
 fi
 
 echo "Finished simulation for", ${brickname}
