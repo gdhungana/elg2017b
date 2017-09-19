@@ -32,10 +32,6 @@ def main(args=None):
 
     if args is None:
        args=parse()
-    #- sample desimodel param
-    #mra,mdec,mamass,mebv,mexpf=sample.sample_model(args.nspec,seed=args.seed)
-    #targetra=mra
-    #targetdec=mdec
 
     if args.airmass:
        airmass=sample.sample_airmass(args.expfile,nobs=args.nspec,seed=args.seed)
@@ -44,10 +40,12 @@ def main(args=None):
         airmass=[cc.nominal_conditions.airmass()]*args.nspec
     print("Airmass:{}".format(airmass))
 
-    #- ebv is close to desimodel
+    #- ebv 
+    #- targetra, dec are sampled tile ra,dec
     if args.ebv:
-       ebv=sample.sample_ebv(args.expfile,nobs=args.nspec,seed=args.seed)
+       targetra,targetdec,ebv=sample.sample_tiles(args.expfile,nobs=args.nspec,seed=args.seed,ebv=True)
     else:
+        targetra,targetdec=sample.sample_tiles(args.expfile,nobs=args.nspec,seed=args.seed,ebv=False)
         ebv=[cc.nominal_conditions.EBV()]*args.nspec
     print("E(B-V):{}".format(ebv))
     print("MAx E(B-V) {}".format(np.max(ebv)))
@@ -85,7 +83,7 @@ def main(args=None):
     print("Exposure Time: {}".format(exposure_t))
     #- write out the observation parameter file
     paramfile='param_'+str(args.seed)+'.txt'
-    np.savetxt(paramfile,np.c_[airmass,ebv,seeing,transparency,moon_frac,moon_sep,moon_alt,exposure_t],fmt='%.3f')
+    np.savetxt(paramfile,np.c_[targetra,targetdec,airmass,ebv,seeing,transparency,moon_frac,moon_sep,moon_alt,exposure_t],fmt='%.3f')
     print("Wrote parameter file {}".format(paramfile))  
     #- Now simulate:
     if args.breakbricks:
