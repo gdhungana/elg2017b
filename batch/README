@@ -1,5 +1,8 @@
 #- batch jobs for running the simulations, redrock etc at NERSC
 ================================================================
+1. simulation.slurm: spectral simulation for diff obs condtions.
+2. simulation_seeing.slurm: separate batch script specifically for 
+   turning on galsim (for seeing variation only)
 
 
 
