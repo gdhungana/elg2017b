@@ -6,7 +6,7 @@ import numpy as np
 import astropy.units as u
 
 from elg2017b.simulate import simulate
-from elg2017b import exptime,sample
+from elg2017b.simulate import exptime,sample
 
 def parse():
     parser=argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)

@@ -53,6 +53,7 @@ def update_simulator(qsim, exptime=None, airmass=None, seeing=None, moon_frac=No
 
     else:
         #- fixing transparency to 1.
+        from elg2017b.simulate.exptime import get_exptime
         exptime=get_exptime(seeing,1.0,airmass,ebv,moon_frac,moon_sep,moon_alt,program=qsim.atmosphere.condition)
 
     return qsim
