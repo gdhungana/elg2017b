@@ -52,9 +52,9 @@ def update_simulator(qsim, exptime=None, airmass=None, seeing=None, moon_frac=No
         qsim.observation.exposure_time=exptime*u.s
 
     else:
-        #- fixing transparency to 1.
+        #- fixing transparency to 1. and ebv=0
         from elg2017b.simulate.exptime import get_exptime
-        exptime=get_exptime(seeing,1.0,airmass,ebv,moon_frac,moon_sep,moon_alt,program=qsim.atmosphere.condition)
+        exptime=get_exptime(seeing,1.0,airmass,0,moon_frac,moon_sep,moon_alt,program=qsim.atmosphere.condition)
 
     return qsim
 
@@ -293,6 +293,9 @@ def _add_truth(hdus, header, meta, trueflux, sflux, wave, channel):
         hdus.append(fits.ImageHDU(swave, name='_SOURCEWAVE', header=header))
         hdus.append(fits.ImageHDU(sflux, name='_SOURCEFLUX', header=header))
         metatable = desiutil.io.encode_table(meta, encoding='ascii')
+        #- write a meta file
+        meta.write('./meta.fits',format='fits')
+        fits.writeto('./meta2.fits',np.array(meta))
         metahdu = fits.convenience.table_to_hdu(meta)
         metahdu.header['EXTNAME'] = '_TRUTH'
         hdus.append(metahdu)
